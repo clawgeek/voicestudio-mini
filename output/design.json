@@ -1,0 +1,36 @@
+{
+  "method": "design_by_params",
+  "params": {
+    "pitch_hz": 200.0,
+    "formant_shift": 1.0,
+    "speed": 1.0,
+    "timbre": [
+      0.2,
+      -0.1,
+      0.3,
+      -0.2
+    ]
+  },
+  "in_valid_range": true,
+  "seed": "b4f88d2d14a22924",
+  "voice_profile": {
+    "pitch_hz": 200.0,
+    "formant_shift": 1.0,
+    "speed": 1.0,
+    "timbre": [
+      0.2,
+      -0.1,
+      0.3,
+      -0.2
+    ]
+  },
+  "watermark": {
+    "type": "audioseal",
+    "detectable": true,
+    "embedded": true
+  },
+  "data_path": {
+    "local_first": true,
+    "external_send": false
+  }
+}
