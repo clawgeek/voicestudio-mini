@@ -1,0 +1,58 @@
+{
+  "quality_gates": [
+    {
+      "id": "G01",
+      "name": "克隆产物含可复现 seed + voice_profile",
+      "pass": true,
+      "message": ""
+    },
+    {
+      "id": "G02",
+      "name": "创声产物参数落在合法区间",
+      "pass": true,
+      "message": ""
+    },
+    {
+      "id": "G03",
+      "name": "转换产物标注 source/target 且带水印",
+      "pass": true,
+      "message": ""
+    },
+    {
+      "id": "G04",
+      "name": "配音流水线 5 步全部完成",
+      "pass": true,
+      "message": ""
+    },
+    {
+      "id": "G05",
+      "name": "引用引擎在注册表内",
+      "pass": true,
+      "message": ""
+    },
+    {
+      "id": "G06",
+      "name": "目标语言在 646 注册表内",
+      "pass": true,
+      "message": ""
+    },
+    {
+      "id": "G07",
+      "name": "合成产物默认带 AudioSeal 水印",
+      "pass": true,
+      "message": ""
+    },
+    {
+      "id": "G08",
+      "name": "数据路径默认本地（external_send=false）",
+      "pass": true,
+      "message": ""
+    },
+    {
+      "id": "G09",
+      "name": "本地 API 仅绑 127.0.0.1 且免 server key",
+      "pass": true,
+      "message": ""
+    }
+  ]
+}
