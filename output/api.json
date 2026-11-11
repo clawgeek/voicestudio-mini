@@ -1,0 +1,12 @@
+{
+  "bind": "127.0.0.1",
+  "port": 3900,
+  "requires_server_key": false,
+  "protocols": [
+    "rest",
+    "sse",
+    "websocket",
+    "mcp"
+  ],
+  "local_first": true
+}
