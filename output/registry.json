@@ -1,0 +1,162 @@
+{
+  "tts_engine_count": 16,
+  "asr_engine_count": 11,
+  "language_count": 646,
+  "tts_engines": [
+    {
+      "id": 0,
+      "name": "xtts_v2",
+      "note": "多语种克隆"
+    },
+    {
+      "id": 1,
+      "name": "bark",
+      "note": "表达丰富"
+    },
+    {
+      "id": 2,
+      "name": "vits",
+      "note": "轻量快"
+    },
+    {
+      "id": 3,
+      "name": "coqui_tts",
+      "note": "开源标准"
+    },
+    {
+      "id": 4,
+      "name": "openvoice",
+      "note": "音色迁移"
+    },
+    {
+      "id": 5,
+      "name": "fish_speech",
+      "note": "少样本"
+    },
+    {
+      "id": 6,
+      "name": "cosyvoice",
+      "note": "阿里系"
+    },
+    {
+      "id": 7,
+      "name": "valle",
+      "note": "自回归"
+    },
+    {
+      "id": 8,
+      "name": "tortoise",
+      "note": "高保真"
+    },
+    {
+      "id": 9,
+      "name": "naturalreaders",
+      "note": "商业风"
+    },
+    {
+      "id": 10,
+      "name": "speecht5",
+      "note": "微软"
+    },
+    {
+      "id": 11,
+      "name": "rvc",
+      "note": "实时变声"
+    },
+    {
+      "id": 12,
+      "name": "so_vits_svc",
+      "note": "歌声"
+    },
+    {
+      "id": 13,
+      "name": "elevenlabs",
+      "note": "SaaS 接入"
+    },
+    {
+      "id": 14,
+      "name": "azure_tts",
+      "note": "云接入"
+    },
+    {
+      "id": 15,
+      "name": "edge_tts",
+      "note": "免费云"
+    }
+  ],
+  "asr_engines": [
+    {
+      "id": 0,
+      "name": "whisper",
+      "note": "OpenAI"
+    },
+    {
+      "id": 1,
+      "name": "whisperx",
+      "note": "对齐时间戳"
+    },
+    {
+      "id": 2,
+      "name": "faster_whisper",
+      "note": "CTranslate 加速"
+    },
+    {
+      "id": 3,
+      "name": "nemo_asr",
+      "note": "NVIDIA"
+    },
+    {
+      "id": 4,
+      "name": "wav2vec2",
+      "note": "Meta"
+    },
+    {
+      "id": 5,
+      "name": "silero",
+      "note": "轻量"
+    },
+    {
+      "id": 6,
+      "name": "vosk",
+      "note": "离线"
+    },
+    {
+      "id": 7,
+      "name": "paraformer",
+      "note": "阿里 FunASR"
+    },
+    {
+      "id": 8,
+      "name": "sensevoice",
+      "note": "多语种"
+    },
+    {
+      "id": 9,
+      "name": "deepgram",
+      "note": "SaaS"
+    },
+    {
+      "id": 10,
+      "name": "azure_sr",
+      "note": "云接入"
+    }
+  ],
+  "languages_sample": [
+    "zh-CN",
+    "en-US",
+    "ja-JP",
+    "ko-KR",
+    "fr-FR",
+    "de-DE",
+    "es-ES",
+    "ru-RU",
+    "ar-SA",
+    "pt-BR",
+    "hi-IN",
+    "it-IT",
+    "th-TH",
+    "vi-VN",
+    "id-ID",
+    "tr-TR"
+  ]
+}
