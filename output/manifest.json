@@ -1,0 +1,18 @@
+{
+  "project": "VoiceStudio Mini",
+  "inspired_by": "https://github.com/debpalash/VoiceStudio",
+  "deterministic": true,
+  "files": [
+    "registry.json",
+    "clone.json",
+    "design.json",
+    "convert.json",
+    "dub.json",
+    "api.json",
+    "quality_gates.json"
+  ],
+  "quality_gates": {
+    "passed": 9,
+    "total": 9
+  }
+}
