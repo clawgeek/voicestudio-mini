@@ -1,0 +1,47 @@
+{
+  "source": "https://example.com/sample.mp4",
+  "source_kind": "url",
+  "target_lang": "en-US",
+  "asr_engine": "whisper",
+  "tts_engine": "xtts_v2",
+  "steps": [
+    {
+      "step": "transcribe",
+      "engine": "whisper",
+      "status": "done",
+      "output": "（示例转写）这是一段用于演示的旁白，VoiceStudio 会在本地完成转写与翻译，并保留原始人声底床。"
+    },
+    {
+      "step": "translate",
+      "engine": "nllb/opus",
+      "status": "done",
+      "output": "(demo translation) This is a narration used for demonstration; VoiceStudio transcribes and translates locally, keeping the original voice bed.",
+      "target": "en-US"
+    },
+    {
+      "step": "keep_original_bed",
+      "status": "done",
+      "output": "原始人声底床已保留（避免机械感）"
+    },
+    {
+      "step": "synthesize",
+      "engine": "xtts_v2",
+      "status": "done",
+      "output": "目标音色合成完成，已嵌入 AudioSeal 水印"
+    },
+    {
+      "step": "mux",
+      "status": "done",
+      "output": "音视频对齐混流完成"
+    }
+  ],
+  "watermark": {
+    "type": "audioseal",
+    "detectable": true,
+    "embedded": true
+  },
+  "data_path": {
+    "local_first": true,
+    "external_send": false
+  }
+}
