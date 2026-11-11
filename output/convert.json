@@ -1,0 +1,22 @@
+{
+  "method": "convert",
+  "asr_engine": "whisper",
+  "source_text": "你好，这是用本地工作站合成的演示语音。",
+  "target_voice_seed": "52273b66c46ffa23",
+  "tts_engine": "xtts_v2",
+  "estimated_duration_s": 1.58,
+  "output": {
+    "format": "wav",
+    "sample_rate": 24000,
+    "speaker_match": 0.75
+  },
+  "watermark": {
+    "type": "audioseal",
+    "detectable": true,
+    "embedded": true
+  },
+  "data_path": {
+    "local_first": true,
+    "external_send": false
+  }
+}
