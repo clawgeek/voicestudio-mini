@@ -1,0 +1,28 @@
+{
+  "method": "clone_from_audio",
+  "reference": "reference_voice.wav",
+  "seed": "52273b66c46ffa23",
+  "reproducible": true,
+  "tts_engine": "xtts_v2",
+  "voice_profile": {
+    "pitch_hz": 261.68,
+    "formant_shift": 1.21,
+    "speed": 1.14,
+    "timbre": [
+      -0.98,
+      0.62,
+      -0.86,
+      -0.65
+    ],
+    "sample_rate": 24000
+  },
+  "watermark": {
+    "type": "audioseal",
+    "detectable": true,
+    "embedded": true
+  },
+  "data_path": {
+    "local_first": true,
+    "external_send": false
+  }
+}
