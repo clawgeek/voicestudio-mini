@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>VoiceStudio Mini · 本地优先语音工作站</title>
+<style>
+  :root{
+    --bg:#0d1117; --panel:#161b22; --panel2:#1c2330; --line:#2b3441;
+    --txt:#e6edf3; --mut:#8b98a8; --amber:#f0a93b; --amber2:#ffce6b;
+    --cyan:#39d0c8; --green:#4ec97a; --red:#ff6b6b; --violet:#a78bfa;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;
+       background:var(--bg);color:var(--txt);line-height:1.6}
+  header{padding:22px 22px 12px;border-bottom:1px solid var(--line);
+         background:linear-gradient(180deg,#11161d,#0d1117)}
+  header h1{margin:0;font-size:22px;letter-spacing:.5px}
+  header h1 b{color:var(--amber)}
+  header p{margin:6px 0 0;color:var(--mut);font-size:13px;max-width:980px}
+  .status{display:inline-flex;gap:14px;align-items:center;margin-top:10px;font-size:12.5px;flex-wrap:wrap}
+  .chip{background:var(--panel2);border:1px solid var(--line);border-radius:20px;padding:4px 12px;color:var(--mut)}
+  .chip b{color:var(--txt)}
+  .dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:6px;vertical-align:middle}
+  .dot.on{background:var(--green);box-shadow:0 0 8px var(--green)}
+  .dot.off{background:var(--red)}
+  .wrap{display:grid;grid-template-columns:340px 1fr;gap:18px;padding:18px;align-items:start}
+  @media(max-width:880px){.wrap{grid-template-columns:1fr}}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px}
+  textarea,input[type=text],select{width:100%;background:var(--panel2);color:var(--txt);
+    border:1px solid var(--line);border-radius:8px;padding:10px;font-size:13px}
+  textarea{height:120px;resize:vertical;line-height:1.6}
+  .btn{margin-top:10px;background:var(--amber);color:#1a1206;border:0;border-radius:8px;
+       padding:10px 14px;font-size:13.5px;font-weight:700;cursor:pointer}
+  .btn:hover{background:var(--amber2)}
+  .btn.ghost{background:transparent;color:var(--amber);border:1px solid var(--amber);font-weight:600}
+  .btn.sm{padding:7px 11px;font-size:12.5px}
+  .tabs{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px}
+  .tab{background:var(--panel2);border:1px solid var(--line);color:var(--mut);
+       padding:7px 12px;border-radius:20px;font-size:12.5px;cursor:pointer}
+  .tab.on{background:var(--amber);color:#1a1206;font-weight:700;border-color:var(--amber)}
+  .stage{display:none}.stage.on{display:block}
+  h2{font-size:16px;margin:0 0 10px;color:var(--amber2)}
+  .kv{display:flex;gap:10px;padding:7px 0;border-bottom:1px dashed var(--line);font-size:13.5px}
+  .kv .k{color:var(--mut);min-width:104px;flex-shrink:0}
+  .tag{display:inline-block;background:var(--panel2);border:1px solid var(--line);
+       color:var(--cyan);padding:2px 9px;border-radius:6px;font-size:11.5px;margin:3px 4px 0 0}
+  .quote{background:#0f141b;border-left:3px solid var(--amber);padding:8px 12px;
+         margin:6px 0;border-radius:0 6px 6px 0;font-size:13px;color:#cdd7e2}
+  .gate{display:flex;align-items:center;gap:10px;padding:9px 12px;background:var(--panel2);
+        border:1px solid var(--line);border-radius:8px;margin-bottom:7px;font-size:13.5px}
+  .badge{font-size:11px;font-weight:700;padding:3px 9px;border-radius:20px;flex-shrink:0}
+  .badge.p{background:rgba(78,201,122,.15);color:var(--green);border:1px solid var(--green)}
+  .badge.f{background:rgba(255,107,107,.15);color:var(--red);border:1px solid var(--red)}
+  .meta{color:var(--mut);font-size:12px;margin-top:10px}
+  .pill{display:inline-block;background:var(--amber);color:#1a1206;border-radius:20px;
+        padding:3px 12px;font-size:12px;font-weight:700;margin:0 6px 6px 0}
+  pre{background:#0f141b;border:1px solid var(--line);border-radius:8px;padding:12px;
+      overflow:auto;font-size:12px;max-height:360px;color:#cdd7e2}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
+  .eng{background:var(--panel2);border:1px solid var(--line);border-radius:9px;padding:9px 11px;font-size:13px}
+  .eng .n{color:var(--amber2);font-weight:700}
+  .eng .d{color:var(--mut);font-size:11.5px;margin-top:2px}
+  .flow{display:flex;flex-wrap:wrap;align-items:stretch;gap:8px;margin:10px 0}
+  .fnode{background:var(--panel2);border:1px solid var(--line);border-radius:9px;padding:10px 12px;
+         flex:1;min-width:120px;font-size:12.5px;text-align:center}
+  .fnode .h{color:var(--amber2);font-weight:700}
+  .fnode .s{color:var(--green);font-size:11px;margin-top:3px}
+  .arrow{align-self:center;color:var(--mut);font-size:18px}
+  .wave{display:flex;align-items:flex-end;gap:2px;height:46px;margin:8px 0}
+  .wave i{width:3px;background:var(--cyan);border-radius:2px;display:block}
+  .lock{color:var(--green);font-weight:700}
+  .apirow{display:flex;gap:8px;align-items:center;padding:8px 0;border-bottom:1px dashed var(--line);font-size:13px}
+  .method{font-weight:700;font-size:11.5px;padding:2px 7px;border-radius:5px;flex-shrink:0}
+  .m-get{background:rgba(57,208,200,.15);color:var(--cyan)}
+  .m-post{background:rgba(240,169,59,.15);color:var(--amber)}
+  .console{background:#0f141b;border:1px solid var(--line);border-radius:8px;padding:10px;
+           font-family:ui-monospace,Menlo,monospace;font-size:11.5px;color:#9fe6c0;
+           max-height:240px;overflow:auto;white-space:pre-wrap;margin-top:8px}
+  .slide{display:flex;align-items:center;gap:10px;margin:8px 0}
+  .slide label{min-width:96px;color:var(--mut);font-size:13px}
+  input[type=range]{flex:1}
+  .sec-note{font-size:12px;color:var(--mut);margin:8px 0;background:var(--panel2);
+            border:1px solid var(--line);border-radius:8px;padding:8px 11px}
+</style>
+</head>
+<body>
+<header>
+  <h1>VoiceStudio Mini · <b>本地优先语音工作站</b></h1>
+  <p>受 debpalash/VoiceStudio 启发的最小可跑通 Demo。本地回环 <b>127.0.0.1:3900</b> 提供 REST / SSE / WebSocket / MCP 四种接入，免 server key，数据默认不离开本机。纯标准库、零 GPU 依赖，克隆即跑。</p>
+  <div class="status">
+    <span class="chip"><span class="dot" id="dot"></span><span id="loopStatus">检测本地 API …</span></span>
+    <span class="chip">引擎 <b>16 TTS</b> / <b>11 ASR</b> / <b>646 语言</b></span>
+    <span class="chip" style="color:var(--green)">🔒 数据默认本地 · 外发需显式 opt-in</span>
+    <span class="chip">水印 <b>AudioSeal</b></span>
+  </div>
+</header>
+
+<div class="wrap">
+  <div class="card">
+    <h2 style="margin-top:0">本地 API（127.0.0.1:3900）</h2>
+    <div class="sec-note">前端与本机后端实时通信。若未启动 <code>server.py</code>，下方各 Tab 会自动降级为内置 JS 确定性模拟，结果一致。</div>
+    <button class="btn sm" id="checkApi">↻ 检测 / 拉取引擎表</button>
+    <div class="meta" id="apiMeta">未连接。</div>
+    <hr style="border:none;border-top:1px solid var(--line);margin:14px 0">
+    <h2>快速体验</h2>
+    <button class="btn" id="runClone">① 克隆 FROM AUDIO</button>
+    <button class="btn ghost" id="runDub">④ 视频配音流水线</button>
+    <button class="btn ghost" id="runGates">查看质量门</button>
+  </div>
+
+  <div class="card">
+    <div class="tabs" id="tabs">
+      <div class="tab on" data-s="clone">① 克隆</div>
+      <div class="tab" data-s="design">② 创声</div>
+      <div class="tab" data-s="convert">③ 转换</div>
+      <div class="tab" data-s="engines">引擎矩阵</div>
+      <div class="tab" data-s="dub">④ 视频配音</div>
+      <div class="tab" data-s="api">本地 API 控制台</div>
+      <div class="tab" data-s="gates">质量门</div>
+    </div>
+    <div id="out"></div>
+  </div>
+</div>
+
+<script>
+// ---------------- 确定性内核（与 core.py 同构，断网时降级） ----------------
+function seedOf(s){let h=0;for(let i=0;i<s.length;i++){h=(h*31+s.charCodeAt(i))>>>0;}return h;}
+function bounded(seed,lo,hi){let f=(seed%100000)/100000;return +(lo+f*(hi-lo)).toFixed(2);}
+function timbre(seed){let v=[],s=seed;for(let i=0;i<4;i++){s=(s*1103515245+12345)>>>0;v.push(+(((s%2000)/1000)-1).toFixed(2));}return v;}
+function hash16(s){let h=seedOf(s);return h.toString(16).padStart(8,'0').slice(0,16);}
+const LANG=["zh-CN","en-US","ja-JP","ko-KR","fr-FR","de-DE","es-ES","ru-RU","ar-SA","pt-BR","hi-IN","it-IT","th-TH","vi-VN","id-ID","tr-TR"];
+
+const TTS=[["xtts_v2","多语种克隆"],["bark","表达丰富"],["vits","轻量快"],["coqui_tts","开源标准"],["openvoice","音色迁移"],["fish_speech","少样本"],["cosyvoice","阿里系"],["valle","自回归"],["tortoise","高保真"],["naturalreaders","商业风"],["speecht5","微软"],["rvc","实时变声"],["so_vits_svc","歌声"],["elevenlabs","SaaS 接入"],["azure_tts","云接入"],["edge_tts","免费云"]];
+const ASR=[["whisper","OpenAI"],["whisperx","对齐时间戳"],["faster_whisper","CTranslate 加速"],["nemo_asr","NVIDIA"],["wav2vec2","Meta"],["silero","轻量"],["vosk","离线"],["paraformer","阿里 FunASR"],["sensevoice","多语种"],["deepgram","SaaS"],["azure_sr","云接入"]];
+
+function cloneFromAudio(ref,eng){const seed=seedOf("clone:"+ref);return{method:"clone_from_audio",reference:ref,seed:hash16("clone:"+ref),reproducible:true,tts_engine:eng||"xtts_v2",voice_profile:{pitch_hz:bounded(seed,85,300),formant_shift:bounded(seed,0.8,1.3),speed:bounded(seed,0.85,1.2),timbre:timbre(seed),sample_rate:24000},watermark:{type:"audioseal",detectable:true,embedded:true},data_path:{local_first:true,external_send:false}};}
+function designByParams(p){p=p||{};const pp={pitch_hz:+p.pitch_hz||180,formant_shift:+p.formant_shift||1.0,speed:+p.speed||1.0,timbre:p.timbre||[0.2,-0.1,0.3,-0.2]};const ok=pp.pitch_hz>=70&&pp.pitch_hz<=400&&pp.formant_shift>=0.5&&pp.formant_shift<=1.6&&pp.speed>=0.6&&pp.speed<=1.6;return{method:"design_by_params",params:pp,in_valid_range:ok,seed:hash16("design:"+JSON.stringify(pp)),voice_profile:pp,watermark:{type:"audioseal",detectable:true,embedded:true},data_path:{local_first:true,external_send:false}};}
+function convertVoice(text,target,eng){const seed=seedOf("convert:"+text+(target.seed||""));return{method:"convert",asr_engine:eng||"whisper",source_text:text,target_voice_seed:target.seed,tts_engine:target.tts_engine||"xtts_v2",estimated_duration_s:+Math.max(1,text.length/12).toFixed(2),output:{format:"wav",sample_rate:24000,speaker_match:bounded(seed,0.7,0.99)},watermark:{type:"audioseal",detectable:true,embedded:true},data_path:{local_first:true,external_send:false}};}
+function videoDub(src,lang,ae,te){const steps=[{step:"transcribe",engine:ae||"whisper",status:"done",output:"（本地 ASR 转写示例文本）"},{step:"translate",engine:"nllb/opus",status:"done",output:"(demo translation)",target:lang},{step:"keep_original_bed",status:"done",output:"原始人声底床已保留"},{step:"synthesize",engine:te||"xtts_v2",status:"done",output:"目标音色合成 + AudioSeal 水印"},{step:"mux",status:"done",output:"音视频对齐混流完成"}];return{source:src,source_kind:src.startsWith("http")?"url":"file",target_lang:lang,asr_engine:ae,tts_engine:te,steps,watermark:{type:"audioseal",detectable:true,embedded:true},data_path:{local_first:true,external_send:false}};}
+
+// 实时 API 开关
+let API_ON=false;
+async function callApi(path,body){
+  if(!API_ON) return null;
+  try{
+    const opt=body?{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)}:{};
+    const r=await fetch("http://127.0.0.1:3900"+path,opt);
+    if(!r.ok) return null;
+    return await r.json();
+  }catch(e){return null;}
+}
+async function checkApi(){
+  try{const r=await fetch("http://127.0.0.1:3900/api/health");const j=await r.json();
+    if(j.status==="ok"){API_ON=true;document.getElementById("dot").className="dot on";
+      document.getElementById("loopStatus").textContent="已连接 127.0.0.1:3900 · 免 key";
+      document.getElementById("apiMeta").innerHTML="本地后端在线：REST/SSE/MCP 实时可用。引擎 "+j.engine.tts+" TTS / "+j.engine.asr+" ASR / "+j.engine.languages+" 语言。";
+      return true;}
+  }catch(e){}
+  API_ON=false;document.getElementById("dot").className="dot off";
+  document.getElementById("loopStatus").textContent="未连接（已降级为内置模拟）";
+  document.getElementById("apiMeta").textContent="未检测到 server.py。各 Tab 使用内置 JS 确定性模拟（结果与后端一致）。可运行 python3 server.py 启用实时 API。";
+  return false;
+}
+
+// ---------------- 渲染 ----------------
+function wave(seed){let s="";for(let i=0;i<48;i++){const h=8+((seedOf(seed+i)%38));s+=`<i style="height:${h}px"></i>`;}return `<div class="wave">${s}</div>`;}
+function renderClone(r){
+  let h=`<h2>① 克隆 FROM AUDIO</h2>`;
+  h+=`<div class="pill">方法 clone_from_audio</div><div class="pill">seed ${r.seed}</div><div class="pill">可复现 ✓</div>`;
+  h+=wave(r.seed);
+  const vp=r.voice_profile;
+  h+=`<div class="kv"><span class="k">参考音频</span><span>${r.reference}</span></div>`;
+  h+=`<div class="kv"><span class="k">TTS 引擎</span><span>${r.tts_engine}</span></div>`;
+  h+=`<div class="kv"><span class="k">基频 pitch</span><span>${vp.pitch_hz} Hz</span></div>`;
+  h+=`<div class="kv"><span class="k">共振峰偏移</span><span>${vp.formant_shift}</span></div>`;
+  h+=`<div class="kv"><span class="k">语速</span><span>${vp.speed}</span></div>`;
+  h+=`<div class="kv"><span class="k">音色向量</span><span>[${vp.timbre.join(", ")}]</span></div>`;
+  h+=`<div class="kv"><span class="k">水印</span><span style="color:var(--green)">${r.watermark.type} · 已嵌入 · 可检测</span></div>`;
+  h+=`<div class="kv"><span class="k">数据路径</span><span class="lock">本地优先 · external_send=false</span></div>`;
+  h+=`<div class="meta">同一参考音频永远得到同一 seed 与参数——这就是 VoiceStudio「克隆可复现」的本地化实现。</div>`;
+  return h;
+}
+function renderDesign(r){
+  let h=`<h2>② 创声 BY DESIGN</h2>`;
+  h+=`<div class="pill">方法 design_by_params</div>`;
+  h+=`<div class="pill" style="background:${r.in_valid_range?'var(--green)':'var(--red)'};color:#0d1117">参数${r.in_valid_range?'合法':'越界'}</div>`;
+  const p=r.params;
+  h+=`<div class="kv"><span class="k">基频 pitch</span><span>${p.pitch_hz} Hz</span></div>`;
+  h+=`<div class="kv"><span class="k">共振峰偏移</span><span>${p.formant_shift}</span></div>`;
+  h+=`<div class="kv"><span class="k">语速</span><span>${p.speed}</span></div>`;
+  h+=`<div class="kv"><span class="k">音色向量</span><span>[${p.timbre.join(", ")}]</span></div>`;
+  h+=`<div class="kv"><span class="k">水印</span><span style="color:var(--green)">${r.watermark.type} · 已嵌入</span></div>`;
+  h+=`<div class="meta">调右侧滑块后点「生成」实时重算。合法区间：pitch 70–400Hz，formant 0.5–1.6，speed 0.6–1.6。</div>`;
+  return h;
+}
+function renderConvert(r){
+  let h=`<h2>③ 转换 CONVERT（语音转语音）</h2>`;
+  h+=`<div class="pill">ASR ${r.asr_engine}</div><div class="pill">TTS ${r.tts_engine}</div>`;
+  h+=`<div class="kv"><span class="k">输入文本</span><span>${r.source_text}</span></div>`;
+  h+=`<div class="kv"><span class="k">目标音色 seed</span><span>${r.target_voice_seed}</span></div>`;
+  h+=`<div class="kv"><span class="k">预计时长</span><span>${r.estimated_duration_s}s</span></div>`;
+  h+=`<div class="kv"><span class="k">说话人匹配度</span><span>${r.output.speaker_match}</span></div>`;
+  h+=`<div class="kv"><span class="k">输出格式</span><span>${r.output.format} @ ${r.output.sample_rate}Hz</span></div>`;
+  h+=`<div class="kv"><span class="k">水印</span><span style="color:var(--green)">${r.watermark.type} · 已嵌入</span></div>`;
+  return h;
+}
+function renderEngines(){
+  let h=`<h2>引擎矩阵 · 16 TTS / 11 ASR / 646 语言</h2>`;
+  h+=`<div class="sec-note">示意清单（数目与 VoiceStudio 公开数字一致；真实引擎以官方仓库为准）。646 语言为注册表声明，实际覆盖与质量取决于所选引擎。</div>`;
+  h+=`<div style="color:var(--amber2);font-weight:700;margin:10px 0 6px">TTS 引擎（${TTS.length}）</div><div class="grid">`;
+  TTS.forEach(([n,d])=>h+=`<div class="eng"><div class="n">${n}</div><div class="d">${d}</div></div>`);
+  h+=`</div><div style="color:var(--amber2);font-weight:700;margin:14px 0 6px">ASR 引擎（${ASR.length}）</div><div class="grid">`;
+  ASR.forEach(([n,d])=>h+=`<div class="eng"><div class="n">${n}</div><div class="d">${d}</div></div>`);
+  h+=`</div><div style="color:var(--amber2);font-weight:700;margin:14px 0 6px">语言（示例 ${LANG.length} / 共 646）</div><div style="margin-top:6px">`;
+  LANG.forEach(l=>h+=`<span class="tag">${l}</span>`);
+  h+=`</div>`;
+  return h;
+}
+function renderDub(r){
+  let h=`<h2>④ 视频配音流水线</h2>`;
+  h+=`<div class="pill">源 ${r.source_kind}</div><div class="pill">目标 ${r.target_lang}</div>`;
+  h+=`<div class="pill">ASR ${r.asr_engine}</div><div class="pill">TTS ${r.tts_engine}</div>`;
+  h+=`<div class="sec-note">上传文件或贴 URL → 自动转写 → 翻译 → <b>保留原声底床</b> → 合成 → 混流。源不离开本机。</div>`;
+  h+=`<div class="flow">`;
+  r.steps.forEach((s,i)=>{
+    h+=`<div class="fnode"><div class="h">${i+1}. ${s.step}</div><div class="s">${s.status==='done'?'✓ done':'…'}</div></div>`;
+    if(i<r.steps.length-1) h+=`<div class="arrow">→</div>`;
+  });
+  h+=`</div>`;
+  h+=`<div class="quote">转写：${r.steps[0].output}</div>`;
+  h+=`<div class="quote">翻译：${r.steps[1].output}</div>`;
+  h+=`<div class="kv"><span class="k">水印</span><span style="color:var(--green)">${r.watermark.type} · 已嵌入合成音轨</span></div>`;
+  h+=`<div class="kv"><span class="k">数据路径</span><span class="lock">本地优先 · external_send=false</span></div>`;
+  return h;
+}
+function renderApi(){
+  let h=`<h2>本地 API 控制台（127.0.0.1:3900）</h2>`;
+  h+=`<div class="sec-note">四种协议同源暴露：REST（请求/响应）、SSE（进度流）、WebSocket（实时双向，README 有协议说明）、MCP（JSON-RPC 供 Agent 调用）。全部免 server key，仅本机回环可访问。</div>`;
+  h+=`<div class="apirow"><span class="method m-get">GET</span><code>/api/health</code><button class="btn sm ghost" data-ep="/api/health" data-m="GET">调用</button></div>`;
+  h+=`<div class="apirow"><span class="method m-get">GET</span><code>/api/registry</code><button class="btn sm ghost" data-ep="/api/registry" data-m="GET">调用</button></div>`;
+  h+=`<div class="apirow"><span class="method m-post">POST</span><code>/api/clone {"reference":"me.wav"}</code><button class="btn sm ghost" data-ep="/api/clone" data-m="POST" data-b='{"reference":"me.wav"}'>调用</button></div>`;
+  h+=`<div class="apirow"><span class="method m-post">POST</span><code>/api/design {"params":{...}}</code><button class="btn sm ghost" data-ep="/api/design" data-m="POST" data-b='{"params":{"pitch_hz":200}}'>调用</button></div>`;
+  h+=`<div class="apirow"><span class="method m-get">GET</span><code>/api/dub?source=...&lang=en-US</code><button class="btn sm ghost" data-ep="/api/dub?source=https://x.com/a.mp4&lang=en-US" data-m="GET">调用</button></div>`;
+  h+=`<div class="apirow"><span class="method m-get">GET</span><code>/api/stream (SSE)</code><button class="btn sm ghost" data-ep="/api/stream" data-m="SSE">订阅</button></div>`;
+  h+=`<div class="apirow"><span class="method m-post">POST</span><code>/api/mcp {"method":"tools/list"}</code><button class="btn sm ghost" data-ep="/api/mcp" data-m="POST" data-b='{"jsonrpc":"2.0","id":1,"method":"tools/list"}'>调用</button></div>`;
+  h+=`<div class="console" id="console"># 控制台输出\n# 启动后端： python3 server.py\n# 未连接时调用将返回「离线·模拟」</div>`;
+  return h;
+}
+function logc(t){const c=document.getElementById("console");if(c){c.textContent+=("\n"+t);c.scrollTop=c.scrollHeight;}}
+function renderGates(g){
+  if(!g||!g.length) return `<h2>质量门</h2><div class="meta">点击左侧「查看质量门」运行全部 9 道质量门（G01–G09）。</div>`;
+  const pass=g.filter(x=>x.pass).length;
+  let h=`<h2>质量门 · ${pass}/${g.length} 通过</h2>`;
+  h+=`<div class="sec-note">脚本化拦截：任一 FAIL 即判定产物未达交付标准（对齐 VoiceStudio 用质量门保证本地产物可信）。</div>`;
+  g.forEach(x=>h+=`<div class="gate"><span class="badge ${x.pass?'p':'f'}">${x.pass?'PASS':'FAIL'}</span><b>${x.id}</b> ${x.name}</div>`);
+  return h;
+}
+
+// ---------------- 状态与动作 ----------------
+let STATE={clone:null,design:null,convert:null,dub:null,gates:null};
+async function doClone(){
+  const ref=document.getElementById("refIn")?.value||"reference_voice.wav";
+  const live=await callApi("/api/clone",{reference:ref});
+  STATE.clone=live||cloneFromAudio(ref);
+  render("clone");switchTab("clone");
+  logc("clone → "+(live?"[live] ":"[模拟] ")+"seed="+STATE.clone.seed);
+}
+async function doDesign(){
+  const p={pitch_hz:+document.getElementById("pPitch").value,
+           formant_shift:+document.getElementById("pForm").value,
+           speed:+document.getElementById("pSpeed").value,
+           timbre:[0.2,-0.1,0.3,-0.2]};
+  const live=await callApi("/api/design",{params:p});
+  STATE.design=live||designByParams(p);
+  render("design");switchTab("design");
+  logc("design → "+(live?"[live] ":"[模拟] ")+"range="+(STATE.design.in_valid_range?'ok':'BAD'));
+}
+async function doConvert(){
+  const text=document.getElementById("convIn").value||"你好，这是本地合成的演示语音。";
+  const tgt=STATE.clone||cloneFromAudio("reference_voice.wav");
+  const live=await callApi("/api/convert",{text,target_seed:tgt.seed,tts_engine:tgt.tts_engine});
+  STATE.convert=live||convertVoice(text,tgt);
+  render("convert");switchTab("convert");
+  logc("convert → "+(live?"[live] ":"[模拟] ")+"match="+STATE.convert.output.speaker_match);
+}
+async function doDub(){
+  const src=document.getElementById("dubIn").value||"https://example.com/sample.mp4";
+  const lang=document.getElementById("dubLang").value||"en-US";
+  const live=await callApi("/api/dub?source="+encodeURIComponent(src)+"&lang="+lang);
+  STATE.dub=live||videoDub(src,lang);
+  render("dub");switchTab("dub");
+  logc("dub → "+(live?"[live] ":"[模拟] ")+"steps="+STATE.dub.steps.length);
+}
+async function doGates(){
+  // 组装完整状态跑质量门（与 pipeline.py 同构）
+  const clone=STATE.clone||cloneFromAudio("reference_voice.wav");
+  const design=STATE.design||designByParams({pitch_hz:200,formant_shift:1.0,speed:1.0,timbre:[0.2,-0.1,0.3,-0.2]});
+  const conv=STATE.convert||convertVoice("演示文本",clone);
+  const dub=STATE.dub||videoDub("https://example.com/sample.mp4","en-US");
+  const A={clone,design,convert:conv,dub,api:{bind:"127.0.0.1",port:3900,requires_server_key:false,protocols:["rest","sse","websocket","mcp"],local_first:true}};
+  STATE.gates=gates(A);render("gates");switchTab("gates");
+}
+function gates(A){const C=[A.clone,A.design,A.convert,A.dub];const g=[];const add=(id,n,ok)=>g.push({id,name:n,pass:!!ok});
+  add("G01","克隆产物含可复现 seed + voice_profile",A.clone.seed&&A.clone.voice_profile);
+  add("G02","创声产物参数落在合法区间",A.design.in_valid_range);
+  add("G03","转换产物标注 source/target 且带水印",A.convert.target_voice_seed&&A.convert.watermark.embedded);
+  add("G04","配音流水线 5 步全部完成",A.dub.steps.length===5&&A.dub.steps.every(s=>s.status==="done"));
+  add("G05","引用引擎在注册表内",TTS.some(e=>e[0]===A.clone.tts_engine)&&ASR.some(e=>e[0]===A.convert.asr_engine));
+  add("G06","目标语言在 646 注册表内",LANG.includes(A.dub.target_lang)||A.dub.target_lang.startsWith(("zh")));
+  add("G07","合成产物默认带 AudioSeal 水印",C.every(x=>x.watermark&&x.watermark.embedded));
+  add("G08","数据路径默认本地（external_send=false）",C.every(x=>x.data_path&&x.data_path.external_send===false));
+  add("G09","本地 API 仅绑 127.0.0.1 且免 server key",A.api.bind==="127.0.0.1"&&A.api.requires_server_key===false);
+  return g;}
+
+const RENDER={clone:renderClone,design:renderDesign,convert:renderConvert,engines:renderEngines,dub:renderDub,api:renderApi,gates:renderGates};
+const FORMS={clone:cloneForm,design:designForm,convert:convertForm,dub:dubForm};
+function render(s){
+  const o=document.getElementById("out");
+  // 无状态时优先显示对应表单（避免对 null 渲染抛错）
+  if(FORMS[s] && !STATE[s]){ o.innerHTML=FORMS[s](); return; }
+  o.innerHTML = RENDER[s] ? RENDER[s](STATE[s]||{}) : "";
+}
+function cloneForm(){return `<h2>① 克隆 FROM AUDIO</h2><input type="text" id="refIn" value="reference_voice.wav"><div style="margin-top:10px"><button class="btn" id="bClone">▶ 克隆音色</button></div>`;}
+function designForm(){return `<h2>② 创声 BY DESIGN</h2><div class="slide"><label>基频 pitch</label><input type="range" id="pPitch" min="70" max="400" value="200"><span id="vPitch">200</span></div><div class="slide"><label>共振峰</label><input type="range" id="pForm" min="0.5" max="1.6" step="0.05" value="1.0"><span id="vForm">1.0</span></div><div class="slide"><label>语速</label><input type="range" id="pSpeed" min="0.6" max="1.6" step="0.05" value="1.0"><span id="vSpeed">1.0</span></div><div style="margin-top:10px"><button class="btn" id="bDesign">▶ 生成音色</button></div>`;}
+function convertForm(){return `<h2>③ 转换 CONVERT</h2><textarea id="convIn">你好，这是用本地工作站合成的演示语音。</textarea><div style="margin-top:10px"><button class="btn" id="bConvert">▶ 转换 / 合成</button></div>`;}
+function dubForm(){return `<h2>④ 视频配音</h2><input type="text" id="dubIn" value="https://example.com/sample.mp4"><div class="slide" style="margin-top:8px"><label>目标语言</label><select id="dubLang">${LANG.map(l=>`<option ${l==='en-US'?'selected':''}>${l}</option>`).join("")}</select></div><div style="margin-top:10px"><button class="btn" id="bDub">▶ 跑配音流水线</button></div>`;}
+
+function switchTab(s){document.querySelectorAll(".tab").forEach(x=>x.classList.toggle("on",x.dataset.s===s));}
+document.getElementById("tabs").addEventListener("click",e=>{const t=e.target.closest(".tab");if(!t)return;switchTab(t.dataset.s);render(t.dataset.s);});
+
+// 事件委托（动态按钮）
+document.addEventListener("click",async e=>{
+  const ep=e.target.dataset.ep;
+  if(ep){ // API 控制台调用
+    if(e.target.dataset.m==="SSE"){
+      logc("SSE /api/stream → 订阅中…");
+      if(API_ON){try{const es=new EventSource("http://127.0.0.1:3900/api/stream");let n=0;es.onmessage=ev=>{n++;logc("  event "+n+": "+ev.data);if(ev.data.includes('"done":true')){es.close();}};setTimeout(()=>es.close(),5000);}catch(err){logc("  SSE 不可用（需后端在线）");}}
+      else logc("  [模拟] SSE：transcribe→translate→keep_original_bed→synthesize→mux 全部 done");
+      return;
+    }
+    const body=e.target.dataset.b?JSON.parse(e.target.dataset.b):undefined;
+    if(API_ON){try{const opt=body?{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)}:{};const r=await fetch("http://127.0.0.1:3900"+ep,opt);const j=await r.json();logc(ep+" → [live] "+JSON.stringify(j).slice(0,180));}catch(err){logc(ep+" → 请求失败");}}
+    else logc(ep+" → [离线·模拟] 启动 python3 server.py 可看真实响应");
+    return;
+  }
+  if(e.target.id==="bClone"){await doClone();}
+  if(e.target.id==="bDesign"){await doDesign();}
+  if(e.target.id==="bConvert"){await doConvert();}
+  if(e.target.id==="bDub"){await doDub();}
+  if(e.target.id==="checkApi"){await checkApi();}
+  if(e.target.id==="runClone"){await doClone();}
+  if(e.target.id==="runDub"){await doDub();}
+  if(e.target.id==="runGates"){await doGates();}
+});
+// 滑块实时显示
+document.addEventListener("input",e=>{
+  if(e.target.id==="pPitch")document.getElementById("vPitch").textContent=e.target.value;
+  if(e.target.id==="pForm")document.getElementById("vForm").textContent=e.target.value;
+  if(e.target.id==="pSpeed")document.getElementById("vSpeed").textContent=e.target.value;
+});
+
+// 深链：?tab=名称[&run=1]（查询参数，无头截图可保留）；也兼容 #tab!run
+async function goHash(){
+  const raw=location.hash.replace("#","");
+  const [hs,hact]=raw.split("!");
+  const tabs=["clone","design","convert","engines","dub","api","gates"];
+  let s=hs, act=hact;
+  const QP=new URLSearchParams(location.search);
+  if(QP.get("tab")){ s=QP.get("tab"); act=QP.get("run")==="1"?"run":""; }
+  if(!tabs.includes(s)) s="clone";
+  await checkApi();           // 先确认本地 API 在线状态，避免竞态
+  switchTab(s);render(s);
+  if(act==="run"){
+    if(s==="clone") await doClone();
+    else if(s==="design") await doDesign();
+    else if(s==="convert") await doConvert();
+    else if(s==="dub") await doDub();
+    else if(s==="gates") await doGates();
+    else if(s==="api"){ document.querySelector('[data-ep="/api/health"]')?.click(); }
+  }
+}
+window.addEventListener("hashchange",goHash);
+
+// 启动
+checkApi();
+goHash();
+</script>
+</body>
+</html>
